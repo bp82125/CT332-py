@@ -39,9 +39,9 @@ def DFS(state: State) -> StateMonad:
         comparator = lambda stateMonad: not newCloseStack.inStack(stateMonad) and not newOpenStack.inStack(stateMonad)
         unvisitedStates = list(filter(comparator, newStates))
 
-        newOpenStack = newOpenStack.pushAll(unvisitedStates)
+        newOpenDFS = newOpenStack.pushAll(unvisitedStates)
 
-        return dfsRecursive(newOpenStack, newCloseStack)
+        return dfsRecursive(newOpenDFS, newCloseStack)
 
     initialStateMonad = StateMonad(state, [])
     initialOpenStack = Stack().push(initialStateMonad)
