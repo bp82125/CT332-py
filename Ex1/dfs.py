@@ -45,7 +45,7 @@ def DFS(state: State) -> StateMonad:
 
     initialStateMonad = StateMonad(state, [])
     initialOpenStack = Stack().push(initialStateMonad)
-    initialCloseSTack = Stack()
+    initialCloseStack = Stack()
 
-    result = dfsRecursive(initialOpenStack, initialCloseSTack)
+    result = dfsRecursive(initialOpenStack, initialCloseStack)
     return result
