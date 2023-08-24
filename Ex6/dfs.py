@@ -1,4 +1,3 @@
-from Ex6 import constants
 from Ex6.stack import Stack
 from Ex6.state import State, StateMonad
 from Ex6.constants import MAX_GLASSES, DEFAULT_STATE
