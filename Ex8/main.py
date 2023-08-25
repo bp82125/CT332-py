@@ -1,36 +1,18 @@
-import heapq
-
+from Ex8.heuristic import a_star
 from state import State
-from heapdict import heapdict
 
-a = State(
+init_state = State(
     eightPuzzle=[
-        [3, 4, 5],
-        [1, 0, 2],
-        [6, 7, 8]
+        [1, 2, 3],
+        [8, 0, 4],
+        [7, 6, 5]
     ],
     emptyRow=1,
     emptyCol=1
 )
 
+result = a_star(init_state)
 
-state = State(
-    eightPuzzle=[
-        [3, 4, 5],
-        [1, 0, 2],
-        [6, 7, 8]
-    ],
-    emptyRow=1,
-    emptyCol=1
-)
-
-priority_queue = heapdict()
-
-priority_queue[state] = state.calculate_heuristic()
-
-
-# b = a_star(a)
-#
-# for i in range(len(b.getLog())):
-#     print(f'Action {i}: ' + b.getLog()[i])
+for i in range(len(result.log)):
+    print(f'Action {i}: ' + result.log[i])
 

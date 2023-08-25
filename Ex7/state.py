@@ -109,7 +109,7 @@ class StateMonad:
     def bind(self, func: Callable[[State], StateMonad]) -> StateMonad:
         if self is not None:
             newState = func(self.unwrap())
-            if newState is not None:
+            if newState is not None and newState.state != self.state:
                 return StateMonad(
                     state=newState.unwrap(),
                     log=self.getLog() + [newState.getLog()[0] + "\n" + str(newState.unwrap())]

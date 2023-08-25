@@ -9,8 +9,8 @@ from constants import ROWS, COLS, EIGHT_PUZZLE_GOAL, EMPTY_ROW, EMPTY_COL
 
 class Action(Enum):
     UP = "Up", (-1, 0)
-    LEFT = "Left", (0, -1)
     DOWN = "Down", (1, 0)
+    LEFT = "Left", (0, -1)
     RIGHT = "Right", (0, 1)
 
 
@@ -69,7 +69,7 @@ class State:
             log=["Error when calling operator: " + action.value[0]]
         )
 
-    def calculate_heuristic(self) -> int:
+    def calculate_distance(self) -> int:
         total_distance = 0
         for i in range(ROWS):
             for j in range(COLS):
@@ -101,10 +101,14 @@ class StateMonad:
     def __init__(self, state: State, log: list = None):
         self.state = state
         self.log = log if log is not None else ["First state" + "\n" + str(self.state)]
-        self.heuristic = state.calculate_heuristic()
+        self.h_score = state.calculate_distance()
+        self.g_score = 0
 
     def __eq__(self, other: StateMonad) -> bool:
-        return self.state == other.state and self.heuristic == other.heuristic
+        return self.state == other.state
+
+    def __hash__(self):
+        return hash(self.state)
 
     def bind(self, func: Callable[[State], StateMonad]) -> StateMonad:
         if self is not None:
@@ -112,27 +116,9 @@ class StateMonad:
             if newState is not None:
                 return StateMonad(
                     state=newState.unwrap(),
-                    log=self.getLog() + [newState.getLog()[0] + "\n" + str(newState.unwrap())]
+                    log=self.log + [newState.log[0] + "\n" + str(newState.unwrap())]
                 )
         return self
 
     def unwrap(self) -> State:
         return self.state
-
-    def getLog(self) -> list:
-        return self.log
-
-    def __lt__(self, other):
-        return self.heuristic < other.heuristic
-
-    def __le__(self, other):
-        return self.heuristic <= other.heuristic
-
-    def __gt__(self, other):
-        return self.heuristic > other.heuristic
-
-    def __ge__(self, other):
-        return self.heuristic >= other.heuristic
-
-    def get_heuristic(self) -> int:
-        return self.heuristic

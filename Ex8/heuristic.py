@@ -1,31 +1,39 @@
 from __future__ import annotations
 
-import heapq
-from state import State, StateMonad, Action, GOAL
+from heapdict import heapdict
+
+from state import State, StateMonad, Action
 
 
 def a_star(initial_state: State) -> StateMonad:
-    priority_queue = []
-    heapq.heappush(priority_queue, (initial_state.calculate_heuristic(), StateMonad(initial_state)))
+    open_queue = heapdict()
+    close_set = heapdict()
 
-    cost_so_far = {initial_state: 0}
-    visited_states = set()
+    initial_state_monad = StateMonad(initial_state)
+    open_queue[initial_state_monad] = initial_state_monad.h_score + initial_state_monad.g_score
 
-    while priority_queue:
-        _, current_state_monad = heapq.heappop(priority_queue)
-        current_state = current_state_monad.unwrap()
+    while open_queue:
+        current_state_monad, _ = open_queue.popitem()
+        close_set[current_state_monad] = current_state_monad.g_score
 
-        if current_state == GOAL:
+        if current_state_monad.unwrap().goal_check():
             return current_state_monad
 
-        visited_states.add(current_state)
-
         for action in Action:
+
             next_state_monad = current_state_monad.bind(lambda state: state.apply_move(action))
-            next_state = next_state_monad.unwrap()
+            next_state_monad.g_score = current_state_monad.g_score + 1
 
-            new_cost = cost_so_far[current_state] + 1
+            if next_state_monad in open_queue and next_state_monad.g_score >= open_queue[next_state_monad] - next_state_monad.h_score:
+                continue
 
-            if (next_state_monad.get_heuristic(), next_state_monad) not in priority_queue and next_state not in visited_states:
-                heuristic_value = next_state_monad.get_heuristic()
-                heapq.heappush(priority_queue, (heuristic_value, next_state_monad))
+            if next_state_monad in close_set and next_state_monad.g_score >= close_set[next_state_monad]:
+                continue
+
+            if next_state_monad in close_set and next_state_monad.g_score < close_set[next_state_monad]:
+                close_set.pop(next_state_monad)
+
+            open_queue[next_state_monad] = next_state_monad.h_score + next_state_monad.g_score
+
+
+
