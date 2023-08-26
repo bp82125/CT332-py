@@ -10,6 +10,7 @@ def a_star(initial_state: State) -> StateMonad:
     close_set = heapdict()
 
     initial_state_monad = StateMonad(initial_state)
+    initial_state_monad.g_score = 0
     open_queue[initial_state_monad] = initial_state_monad.h_score + initial_state_monad.g_score
 
     while open_queue:
