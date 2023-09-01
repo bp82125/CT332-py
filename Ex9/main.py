@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from board import Board
 
 if __name__ == "__main__":
@@ -9,7 +11,7 @@ if __name__ == "__main__":
             for col_idx, value in enumerate(row):
                 if value != 0:
                     board.grid[row_idx][col_idx].collapse(value)
+        board.setEntropy()
 
     print(board)
-
     board.solve()

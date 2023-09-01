@@ -129,6 +129,9 @@ class Board:
             return True
 
     def solve(self):
+
+        self.base_grid = deepcopy(self.grid)
+
         iteration_counts = 0
         attempt_solving = 1
         while self.not_solved():
