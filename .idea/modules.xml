@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/CT332 Py.iml" filepath="$PROJECT_DIR$/.idea/CT332 Py.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Sudoku_WFC/.idea/SudokuGenerator.iml" filepath="$PROJECT_DIR$/../Sudoku_WFC/.idea/SudokuGenerator.iml" />
     </modules>
   </component>
 </project>
