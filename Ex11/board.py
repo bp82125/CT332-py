@@ -118,11 +118,9 @@ class Board:
         self.possibilities[coord.row][coord.col] = [value]
 
         if not self.propagate(tile):
-            self.restore_tile(coord)
             return False
 
         if self.check_if_full_cage(cage) and self.calculate_cage_value(cage) != cage.goal:
-            self.restore_tile(coord)
             return False
 
         return True
