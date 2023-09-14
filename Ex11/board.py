@@ -57,9 +57,18 @@ class Board:
                     return key if key != '.' else ' '
 
         for row in self.grid:
-            print("  |".join(
-                [f"{self.cages[row[i].cage_index].goal:2}{get_char_operator(self.cages[row[i].cage_index].operator)}"
-                 for i in range(GRID_SIZE)]))
+            cage_strings = []
+            for i in range(GRID_SIZE):
+                goal = self.cages[row[i].cage_index].goal
+                operator = get_char_operator(self.cages[row[i].cage_index].operator)
+                cell_str = f"{goal}{operator}"
+                cage_strings.append(cell_str.ljust(3))
+
+            print(" |".join(cage_strings))
+        # for row in self.grid:
+        #     print("|".join(
+        #         [f"{self.cages[row[i].cage_index].goal:2}{get_char_operator(self.cages[row[i].cage_index].operator)}"
+        #          for i in range(GRID_SIZE)]))
 
     # Reset the possible values of each tile to [1,2,3,4].
     # Then use the already visited tiles to collapse the possible values of unvisited tiles
