@@ -1,5 +1,5 @@
-from Ex11.board import Board
-from Ex11.helper_classes import Coordinate
+from board import Board
+from helper_classes import Coordinate
 
 
 # Function to read cages from file with the following format:
@@ -18,4 +18,3 @@ def read_cage_from_file(file_path: str):
             board.create_cage(value, operator, coordinates)
 
     return board
-

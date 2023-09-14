@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from Ex11.constants import GRID_SIZE
-
 
 @dataclass
 class Coordinate:

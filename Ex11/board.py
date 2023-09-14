@@ -1,7 +1,7 @@
 from functools import reduce
 
-from Ex11.constants import GRID_SIZE
-from Ex11.helper_classes import Tile, Coordinate, Cage, char_to_operator, Operator
+from constants import GRID_SIZE
+from helper_classes import Tile, Coordinate, Cage, char_to_operator, Operator
 
 
 class Board:
