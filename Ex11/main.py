@@ -1,7 +1,6 @@
-from Ex11.helper_classes import Operator, char_to_operator
 from Ex11.utils import read_cage_from_file
 
-board = read_cage_from_file("input_cage3.txt")
+board = read_cage_from_file("input_cage4.txt")
 board.iteration_count = 0
 
 if board.solve():
@@ -14,3 +13,4 @@ if board.solve():
     board.print_cages()
 else:
     print("Can't solve")
+    print(board)

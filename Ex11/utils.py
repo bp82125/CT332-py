@@ -3,7 +3,7 @@ from Ex11.helper_classes import Coordinate
 
 
 # Function to read cages from file with the following format:
-# "goal, operator, number_of_coordinates, coordinate.row1, coordinate.col1,..."
+# "goal, operator, number_of_coordinates, coordinate.row1, coordinate.col1 coordinate.row2, coordinate.col2,..."
 def read_cage_from_file(file_path: str):
     board = Board()
     with open(file_path, 'r') as file:

@@ -9,12 +9,18 @@ class Coordinate:
     row: int
     col: int
 
+    def __repr__(self):
+        return f'({self.row}, {self.col})'
+
 
 @dataclass
 class Tile:
     coord: Coordinate
     value: int
     cage_index: int
+
+    def __repr__(self):
+        return str(self.value)
 
 
 class Operator(Enum):

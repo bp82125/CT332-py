@@ -27,8 +27,11 @@ class Board:
 
         self.reset_possibilities()
 
-        # For tracking solving only
+        # For counting how many times did the solve method was recursively called
         self.iteration_count = 0
+
+    def __repr__(self):
+        return str(self.grid)
 
     # Check whether a board is completed or not
     @property
@@ -43,6 +46,9 @@ class Board:
 
     def get_possible_values_by_coord(self, coord: Coordinate) -> list[int]:
         return self.possibilities[coord.row][coord.col]
+
+    def get_possible_values_by_row_col(self, row: int, col: int) -> list[int]:
+        return self.possibilities[row][col]
 
     # For printing result
     def print_values(self):
@@ -65,13 +71,7 @@ class Board:
                 cage_strings.append(cell_str.ljust(3))
 
             print(" |".join(cage_strings))
-        # for row in self.grid:
-        #     print("|".join(
-        #         [f"{self.cages[row[i].cage_index].goal:2}{get_char_operator(self.cages[row[i].cage_index].operator)}"
-        #          for i in range(GRID_SIZE)]))
 
-    # Reset the possible values of each tile to [1,2,3,4].
-    # Then use the already visited tiles to collapse the possible values of unvisited tiles
     def reset_possibilities(self):
         self.possibilities = [[[n + 1 for n in range(GRID_SIZE)] for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
@@ -89,18 +89,22 @@ class Board:
         if len(list_coords) == 1:
             self.collapse_tile(list_coords[0], value)
 
-    # Collapse the possible values of all tiles in the the source's col and source's row
+    # Collapse the possible values of all tiles in the source's col and source's row
     def propagate(self, tile: Tile) -> bool:
-        for i in range(GRID_SIZE):
-            if tile.value in self.possibilities[tile.coord.row][i] and i != tile.coord.col:
-                self.possibilities[tile.coord.row][i].remove(tile.value)
-                if len(self.possibilities[tile.coord.row][i]) <= 0:
+        # Spread constraints in a row
+        for col in range(GRID_SIZE):
+            current_possible_values = self.get_possible_values_by_row_col(tile.coord.row, col)
+            if tile.value in current_possible_values and col != tile.coord.col:
+                current_possible_values.remove(tile.value)
+                if len(current_possible_values) <= 0:
                     return False
 
-        for i in range(GRID_SIZE):
-            if tile.value in self.possibilities[i][tile.coord.col] and i != tile.coord.row:
-                self.possibilities[i][tile.coord.col].remove(tile.value)
-                if len(self.possibilities[i][tile.coord.col]) <= 0:
+        # Spread constraints in a col
+        for row in range(GRID_SIZE):
+            current_possible_value = self.get_possible_values_by_row_col(row, tile.coord.col)
+            if tile.value in current_possible_value and row != tile.coord.row:
+                current_possible_value.remove(tile.value)
+                if len(current_possible_value) <= 0:
                     return False
 
         return True
@@ -110,17 +114,7 @@ class Board:
     # If false, restore the board to the previous state
     def collapse_tile(self, coord: Coordinate, value: int) -> bool:
         tile = self.get_tile_by_coord(coord)
-        possible_values = self.get_possible_values_by_coord(coord)
         cage = self.get_cage_by_coord(coord)
-
-        if tile.value != 0:
-            return False
-
-        if len(possible_values) <= 0:
-            return False
-
-        if value not in possible_values:
-            return False
 
         tile.value = value
         self.placed_tiles.append(tile)
@@ -138,26 +132,29 @@ class Board:
     # Restore the value of the tile to default
     # Start propagating again
     def restore_tile(self, coord: Coordinate):
-        self.placed_tiles.pop()
-        self.get_tile_by_coord(coord).value = 0
-        self.reset_possibilities()
+        for tile in self.placed_tiles:
+            if tile.coord == coord:
+                self.placed_tiles.remove(tile)
+                self.get_tile_by_coord(coord).value = 0
+                self.reset_possibilities()
 
-    # Return a list of coordinates of unvisited tiles, which have the lowest entropy
-    def smallest_possibilities(self) -> list[Coordinate]:
-        min_length = GRID_SIZE + 1
-        list_coords = []
+    # Return the coordinates of unvisited and having the lowest entropy tile
+    def smallest_entropy_coord(self) -> Coordinate:
+        min_entropy = GRID_SIZE + 1
+        min_entropy_coords = []
+
         for row in range(GRID_SIZE):
             for col in range(GRID_SIZE):
                 if self.grid[row][col].value == 0:
-                    min_length = min(min_length, len(self.possibilities[row][col]))
+                    entropy = len(self.get_possible_values_by_row_col(row, col))
+                    if entropy < min_entropy:
+                        min_entropy = entropy
+                        min_entropy_coords = [Coordinate(row, col)]
+                    elif entropy == min_entropy:
+                        min_entropy_coords.append(Coordinate(row, col))
 
-        for row in range(GRID_SIZE):
-            for col in range(GRID_SIZE):
-                if len(self.possibilities[row][col]) == min_length:
-                    if self.grid[row][col].value == 0:
-                        list_coords.append(Coordinate(row, col))
-
-        return list_coords
+        if min_entropy_coords:
+            return min_entropy_coords[0]
 
     # Helper function to calculate the value of the cage so far
     # If the cage isn't completed, return 0
@@ -181,23 +178,24 @@ class Board:
         list_values = [self.get_tile_by_coord(coord).value for coord in cage.list_coords]
         return 0 not in list_values
 
+    # Solving the KenKen problem with backtracking
     def solve(self) -> bool:
         self.iteration_count += 1
         if self.is_solved:
             return True
 
-        least_entropy = self.smallest_possibilities()
+        coord = self.smallest_entropy_coord()
 
-        for coord in least_entropy:
-            values = self.get_possible_values_by_coord(coord)
-            if len(values) <= 0:
-                return False
+        if coord is None:
+            return False
 
-            for value in values:
-                if self.collapse_tile(coord, value):
-                    if self.solve():
-                        return True
-                    else:
-                        self.restore_tile(coord)
+        values = self.get_possible_values_by_coord(coord)
 
+        for value in values:
+            if self.collapse_tile(coord, value):
+                # Collapse successfully
+                if self.solve():
+                    return True
+                # Backtrack to the previous state
+            self.restore_tile(coord)
         return False
