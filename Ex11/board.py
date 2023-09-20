@@ -38,6 +38,8 @@ class Board:
     def is_solved(self):
         return len(self.placed_tiles) == GRID_SIZE * GRID_SIZE
 
+    # ------------------------- Getter methods --------------------------------------
+
     def get_tile_by_coord(self, coord: Coordinate) -> Tile:
         return self.grid[coord.row][coord.col]
 
@@ -49,6 +51,8 @@ class Board:
 
     def get_possible_values_by_row_col(self, row: int, col: int) -> list[int]:
         return self.possibilities[row][col]
+
+    # ------------------------- Getter methods --------------------------------------
 
     # For printing result
     def print_values(self):
@@ -72,6 +76,8 @@ class Board:
 
             print(" |".join(cage_strings))
 
+    # Reset the possible values of each tile to [1..GRID_SIZE]
+    # Use the list of visited tiles to eliminate values
     def reset_possibilities(self):
         self.possibilities = [[[n + 1 for n in range(GRID_SIZE)] for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
@@ -139,7 +145,7 @@ class Board:
                 self.reset_possibilities()
 
     # Return the coordinates of unvisited and having the lowest entropy tile
-    def smallest_entropy_coord(self) -> Coordinate:
+    def minimal_entropy_coord(self) -> Coordinate:
         min_entropy = GRID_SIZE + 1
         min_entropy_coords = []
 
@@ -184,7 +190,7 @@ class Board:
         if self.is_solved:
             return True
 
-        coord = self.smallest_entropy_coord()
+        coord = self.minimal_entropy_coord()
 
         if coord is None:
             return False

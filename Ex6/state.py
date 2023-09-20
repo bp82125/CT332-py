@@ -13,7 +13,7 @@ class State:
             self.glasses = glasses
 
     def __str__(self):
-        glass_strings = [glass.value for glass in self.glasses]
+        glass_strings = [glass.color for glass in self.glasses]
         glasses_str = "".join([f"{s:<6}" for s in glass_strings])
         index_str = "{}".format("     ".join(str(i + 1) for i in range(MAX_GLASSES))) + "\n"
         return glasses_str + "\n" + index_str
